@@ -16,7 +16,7 @@
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM
-import Control.Exception (catch, finally)
+import Control.OldException (catch, finally)
 import Control.Monad.Error
 import Control.Monad.State
 import Data.Char (isControl)
@@ -32,7 +32,8 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import qualified Data.Set as S
 
 -- This requires the HTTP package, which is not bundled with GHC
-import Network.HTTP
+import Network.Stream (Result)
+import Network.HTTP hiding (Done)
 
 type URL = B.ByteString
 
@@ -130,7 +131,7 @@ getStatus = chase (5 :: Int)
             (a,b,c) -> return . Right $ a * 100 + b * 10 + c
     bail = return . Left
 
-getHead :: URI -> IO (Result Response)
+getHead :: URI -> IO (Result (Response String))
 getHead uri = simpleHTTP Request { rqURI = uri,
                                    rqMethod = HEAD,
                                    rqHeaders = [],
